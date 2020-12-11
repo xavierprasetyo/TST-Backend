@@ -11,17 +11,30 @@ import (
 type Message struct {
 	Msg string `json:"msg"`
 }
+type Auth struct {
+	Token string `json:"token"`
+}
 
 func main() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api", test).Methods("GET")
+	router.HandleFunc("/api", test).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
+
 }
 
 func test(w http.ResponseWriter, r *http.Request) {
-	msg := Message{Msg: "Halo Halo"}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(msg)
+	decoder := json.NewDecoder(r.Body)
+	var t Auth
+	err := decoder.Decode(&t)
+	if err != nil {
+		panic(err)
+	}
+	isValid, error := verifyIdToken(t.Token)
+	if error == nil {
+		log.Println(isValid)
+	} else {
+		panic(error)
+	}
 }
