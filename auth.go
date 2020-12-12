@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"google.golang.org/api/oauth2/v2"
@@ -12,6 +11,10 @@ var (
 	googleOauthId = ""
 )
 
+type Auth struct {
+	Token string `json:"token"`
+}
+
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
@@ -20,13 +23,10 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		// if error == nil && tokenResponse.Audience == googleOauthId {
 		// 	next.ServeHTTP(w, req)
 		// } else {
-		// 	w.WriteHeader(http.StatusUnauthorized)
-		// 	json.NewEncoder(w).Encode(Message{Msg: "No token found"})
-		// 	panic(error)
+		// 	sendError(w, http.StatusUnauthorized, "No token found")
 		// }
 		if token == "" {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(Message{Msg: "No token found"})
+			sendError(w, http.StatusUnauthorized, "No token found")
 		} else {
 			next.ServeHTTP(w, req)
 		}

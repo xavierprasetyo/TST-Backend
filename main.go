@@ -11,14 +11,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Message struct {
-	Msg string `json:"msg"`
-}
-type Auth struct {
-	Token string `json:"token"`
-}
-
 func main() {
+	createClient()
 	err := godotenv.Load(".env")
 
 	if err != nil {
@@ -27,18 +21,18 @@ func main() {
 	googleOauthId = os.Getenv("GOOGLE_OAUTH_ID")
 
 	fmt.Println("Start")
-	items = append(items, Item{
-		ID:      "1",
-		Name:    "Telur",
-		Checked: false,
-		Crossed: true,
-	})
-	items = append(items, Item{
-		ID:      "2",
-		Name:    "Ayam",
-		Checked: true,
-		Crossed: true,
-	})
+	// items = append(items, Item{
+	// 	ID:      "1",
+	// 	Name:    "Telur",
+	// 	Checked: false,
+	// 	Crossed: true,
+	// })
+	// items = append(items, Item{
+	// 	ID:      "2",
+	// 	Name:    "Ayam",
+	// 	Checked: true,
+	// 	Crossed: true,
+	// })
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -47,7 +41,7 @@ func main() {
 	apiRouter.HandleFunc("/items/add", addItem).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/items/check", checkItem).Methods(http.MethodPut)
 	apiRouter.HandleFunc("/items/cross", crossItem).Methods(http.MethodPut)
-	apiRouter.HandleFunc("/items/delete/{id}", deleteItem).Methods(http.MethodDelete)
+	apiRouter.HandleFunc("/items/delete", deleteItem).Methods(http.MethodDelete)
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 
