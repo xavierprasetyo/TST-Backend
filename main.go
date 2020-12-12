@@ -23,7 +23,7 @@ func main() {
 
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	apiRouter.Use(HandlerInit, AuthMiddleware, Logger)
+	apiRouter.Use(HeaderInit, AuthMiddleware, Logger)
 	apiRouter.HandleFunc("/items", getItems).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/items/add", addItem).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/items/check", checkItem).Methods(http.MethodPut)
@@ -34,7 +34,7 @@ func main() {
 
 }
 
-func HandlerInit(next http.Handler) http.Handler {
+func HeaderInit(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
