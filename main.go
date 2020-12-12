@@ -32,8 +32,7 @@ func main() {
 	apiRouter.HandleFunc("/items/add", addItem).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/items/check", checkItem).Methods(http.MethodPut)
 	apiRouter.HandleFunc("/items/cross", crossItem).Methods(http.MethodPut)
-	apiRouter.HandleFunc("/items/delete", deleteItem).Methods(http.MethodDelete)
-	apiRouter.HandleFunc("/items/delete", deleteItem).Methods(http.MethodDelete)
+	apiRouter.HandleFunc("/items/delete/{id}", deleteItem).Methods(http.MethodDelete)
 
 	apiRouter.HandleFunc("/log/reset", resetLogHandler).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/log", getLog).Methods(http.MethodGet)

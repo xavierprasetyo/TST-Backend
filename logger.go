@@ -37,12 +37,14 @@ func Logger(next http.Handler) http.Handler {
 		case "/items/cross":
 			api = "Cross_Item"
 			break
-		case "/items/delete":
-			api = "Delete_Item"
-			break
 		default:
-			next.ServeHTTP(w, req)
-			return
+			if strings.Contains(path, "/items/delete") {
+				api = "Delete_Item"
+				break
+			} else {
+				next.ServeHTTP(w, req)
+				return
+			}
 		}
 		client, ctx, err := createClient()
 		if err != nil {

@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"cloud.google.com/go/firestore"
+	"github.com/gorilla/mux"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -30,7 +30,7 @@ type (
 
 	CrossResponse struct {
 		Success bool `json:"success"`
-		Crossed bool `json:"checked"`
+		Crossed bool `json:"crossed"`
 	}
 
 	DeleteResponse struct {
@@ -123,7 +123,7 @@ func checkItem(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	defer client.Close()
-	json.NewEncoder(w).Encode(CrossResponse{Success: true, Crossed: *item.Checked})
+	json.NewEncoder(w).Encode(CheckResponse{Success: true, Checked: *item.Checked})
 }
 
 func crossItem(w http.ResponseWriter, r *http.Request) {
@@ -154,16 +154,16 @@ func crossItem(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	defer client.Close()
-	json.NewEncoder(w).Encode(CheckResponse{Success: true, Checked: *item.Crossed})
+	json.NewEncoder(w).Encode(CrossResponse{Success: true, Crossed: *item.Crossed})
 }
 
 func deleteItem(w http.ResponseWriter, r *http.Request) {
-	if len(r.URL.Query()["id"]) == 0 {
+	params := mux.Vars(r)
+	deleteID := params["id"]
+	if deleteID == "" {
 		sendError(w, http.StatusBadRequest, "No ID Provided")
 		return
 	}
-	deleteID := r.URL.Query()["id"][0]
-	log.Println(deleteID)
 	client, ctx, err := createClient()
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, "Error Creating Firebase Client")
