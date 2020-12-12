@@ -19,17 +19,17 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
 		token := req.Header.Get("Authorization")
-		// tokenResponse, error := verifyIdToken(token)
-		// if error == nil && tokenResponse.Audience == googleOauthId {
-		// 	next.ServeHTTP(w, req)
-		// } else {
-		// 	sendError(w, http.StatusUnauthorized, "No token found")
-		// }
-		if token == "" {
-			sendError(w, http.StatusUnauthorized, "No token found")
-		} else {
+		tokenResponse, error := verifyIdToken(token)
+		if error == nil && tokenResponse.Audience == googleOauthId {
 			next.ServeHTTP(w, req)
+		} else {
+			sendError(w, http.StatusUnauthorized, "No token found")
 		}
+		// if token == "" {
+		// 	sendError(w, http.StatusUnauthorized, "No token found")
+		// } else {
+		// 	next.ServeHTTP(w, req)
+		// }
 	})
 }
 
