@@ -28,7 +28,7 @@ func main() {
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	apiRouter.Use(HeaderInit, AuthMiddleware, Logger)
-	apiRouter.HandleFunc("/items", getItems).Methods(http.MethodGet, http.MethodOptions)
+	apiRouter.HandleFunc("/items", getItems).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/items/add", addItem).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/items/check", checkItem).Methods(http.MethodPut)
 	apiRouter.HandleFunc("/items/cross", crossItem).Methods(http.MethodPut)
