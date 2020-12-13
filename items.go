@@ -98,7 +98,7 @@ func addItem(w http.ResponseWriter, r *http.Request) {
 func checkItem(w http.ResponseWriter, r *http.Request) {
 	var item Item
 	_ = json.NewDecoder(r.Body).Decode(&item)
-	if item.Checked == nil {
+	if item.Checked == nil || item.ID == "" {
 		sendError(w, http.StatusBadRequest, "Required Body Not Found")
 		return
 	}
@@ -129,7 +129,7 @@ func checkItem(w http.ResponseWriter, r *http.Request) {
 func crossItem(w http.ResponseWriter, r *http.Request) {
 	var item Item
 	_ = json.NewDecoder(r.Body).Decode(&item)
-	if item.Crossed == nil {
+	if item.Crossed == nil || item.ID == "" {
 		sendError(w, http.StatusBadRequest, "Required Body Not Found")
 		return
 	}
