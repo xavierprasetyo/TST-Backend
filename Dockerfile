@@ -1,14 +1,31 @@
-FROM golang:1.12.0-alpine3.9
-RUN mkdir /app
-ADD . /app
-WORKDIR /app
-## Add this go mod download command to pull in any dependencies
-RUN apk update && apk add --no-cache git ca-certificates && update-ca-certificates
+FROM golang:1.12-alpine@sha256:1121c345b1489bb5e8a9a65b612c8fed53c175ce72ac1c76cf12bbfc35211310 as builder
+# Force the go compiler to use modules
+ENV GO111MODULE=on
+# Create the user and group files to run unprivileged 
+RUN mkdir /user && \
+    echo 'nobody:x:65534:65534:nobody:/:' > /user/passwd && \
+    echo 'nobody:x:65534:' > /user/group
+RUN apk update && apk add --no-cache git ca-certificates tzdata 
+RUN mkdir /build 
+COPY . /build/
+WORKDIR /build 
+# Import the code
+COPY ./ ./
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o main .
 
-RUN go mod tidy
-RUN go mod download
-## Our project will now successfully build with the necessary go libraries included.
-RUN go build -o main .
-## Our start command which kicks off
-## our newly created binary executable
-CMD ["/app/main"]
+FROM scratch AS final
+LABEL author="Xavier"
+# Import the time zone files
+COPY .env /
+COPY serviceKey.json /
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+# Import the user and group files
+COPY --from=builder /user/group /user/passwd /etc/
+# Import the CA certs
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+# Import the compiled go executable
+COPY --from=builder /build/main /
+WORKDIR /
+# Run as unpriveleged
+USER nobody:nobody
+ENTRYPOINT ["/main"]
